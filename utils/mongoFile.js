@@ -1,6 +1,6 @@
 const { GridFSBucket, ObjectId } = require("mongodb");
 const { client } = require("../database/mongoDb");
-const { Readable } = require("stream");
+const { Readable, Writable } = require("stream");
 const { rejects } = require("assert");
 const { ObjectID } = require("mongodb");
 
@@ -18,13 +18,14 @@ const dbUploadFile = async (file) => {
             field: "my Field",
             value: "my Value",
         };
+
         const uploadPromise = new Promise((resolve, reject) => {
+            let upLoadStream = bucket.openUploadStream(fileName, {
+                metadata: metadata,
+            });
+
             Readable.from(file.buffer)
-                .pipe(
-                    bucket.openUploadStream(fileName, {
-                        metadata: metadata,
-                    })
-                )
+                .pipe(upLoadStream)
                 .on("error", (err) => {
                     reject(err);
                 })
@@ -43,7 +44,6 @@ const dbUploadFile = async (file) => {
     }
 };
 
-
 const dbGetFileInfos = async () => {
     try {
         await client.connect();
@@ -59,8 +59,6 @@ const dbGetFileInfos = async () => {
             "metadata.field": "my Field",
         });
         return await cursor.toArray();
-
-        // await uploadPromise;
     } catch (err) {
         // console.log("err", err);
         throw err;
@@ -70,6 +68,42 @@ const dbGetFileInfos = async () => {
     }
 };
 
+const dbGetOneFile = async (fileName) => {
+    try {
+        await client.connect();
+        const db = client.db(process.env.MONGO_DB);
 
+        let bucket = new GridFSBucket(db, {
+            bucketName: "myBucket",
+        });
 
-module.exports = { dbUploadFile, dbGetFileInfos };
+        // console.log(fileName);
+        const promise = new Promise((resolve, reject) => {
+            const _buffer = [];
+            bucket
+                .openDownloadStreamByName(fileName)
+                .on("data", (chunk) => {
+                    _buffer.push(chunk);
+                })
+                .on("end", () => {
+                    // const file = Buffer.concat(_buffer);
+                    // console.log("File Downloaded!");
+                    resolve(Buffer.concat(_buffer));
+                })
+                .on("error", (err) => {
+                    // console.log(err);
+                    reject(err);
+                });
+        });
+
+        return await promise;
+    } catch (err) {
+        // console.log("err", err);
+        throw err;
+    } finally {
+        // console.log("connection close");
+        await client.close();
+    }
+};
+
+module.exports = { dbUploadFile, dbGetFileInfos, dbGetOneFile };

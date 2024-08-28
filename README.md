@@ -1,9 +1,9 @@
 # Mongoose + Nodejs for files
 
 Progress
-- [x] Upload files
-- [ ] Download files
-- [ ] Upload / Download with Mongo
+- [x] Upload to mongo
+- [x] download from mongo
+- [x] get all files metadatas
 
 Basic setup
 ```sh
