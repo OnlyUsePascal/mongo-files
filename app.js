@@ -4,8 +4,11 @@ const app = express();
 const bodyParser = require("body-parser");
 const path = require("path");
 const fileRouter = require("./routers/fileRouter");
-const mongoCon = require("./utils/mongoDb");
 const errorHandler = require("./controllers/errorController");
+// const { mongoBucketConn, mongoDbConn } = require("./utils/mongoDb.js.bak");
+
+// mongoBucketConn();
+// mongoDbConn();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -19,4 +22,3 @@ app.listen(PORT, () => {
     console.log(`=> Litening on port ${PORT}`);
 });
 
-mongoCon();
