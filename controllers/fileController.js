@@ -4,20 +4,13 @@ const { dbUploadFile } = require("../utils/mongoFile");
 // const testUpload = require("../database/mongoDb");
 
 
-const getFile = async (req, res, next) => {
-    const users = await User.find();
-    console.log(users);
-    
+const getFiles = async (req, res, next) => {
     return res
         .status(StatusCodes.ACCEPTED)
         .json({
-            message : `file name = ${req.params.filename}`
+            message : `gg well played`
         });
 };
-
-
-// const listFile = async (req, rses)
-
 
 const uploadFile = async (req, res, next) => {
     const statusCode = req.file
@@ -25,12 +18,11 @@ const uploadFile = async (req, res, next) => {
         : StatusCodes.BAD_REQUEST;
     const fileInfo = req.file || "No file received!";
     
-    // await testUpload(req.file.buffer);
     await dbUploadFile(req.file);
-    // await uploadFile(req.file);
+
     return res.status(statusCode).json({
-        message: fileInfo,
+        message: 'File Uploaded!',
     });
 };
 
-module.exports = {getFile, uploadFile};
+module.exports = {getFiles, uploadFile};
