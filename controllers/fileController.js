@@ -14,15 +14,15 @@ const getFile = async (req, res, next) => {
 };
 
 
-const uploadFile = async (req, res, next) => {
-    // upload status here
+const uploadFile = (req, res, next) => {
+    const statusCode = req.file
+        ? StatusCodes.ACCEPTED
+        : StatusCodes.BAD_REQUEST;
+    const fileInfo = req.file || "No file received!";
     
-    return res
-        .status(StatusCodes.ACCEPTED)
-        .json({
-            
-            message : `File received !!!`
-        });
+    return res.status(statusCode).json({
+        message: fileInfo,
+    });
 };
 
 module.exports = {getFile, uploadFile};
